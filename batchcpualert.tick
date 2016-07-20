@@ -1,0 +1,529 @@
+puidle = batch
+        |query(''' SELECT mean(usage_idle) FROM "telegraf"."twenty_days"."cpu" where host='influxserver' and cpu='cpu-total' ''')
+                .period(25m)
+                .every(25m)
+        |alert()
+        .info(lambda: "mean" < 70)
+        .warn(lambda: "mean" < 50)
+        .crit(lambda: "mean" < 30)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Influxdb </h2>
+        <p>Alerte pour l'utilisation CPU du serveur Influxdb: Valeur moyenne du usage_idle est <b>{{ index .Fields "mean"}}</b> pour les 25 dernieres minutes. </p>
+        ''')
+        .email()
+var cpusystem = batch
+        |query(''' SELECT mean(usage_system) FROM "telegraf"."twenty_days"."cpu" where host='influxserver' and cpu='cpu-total' ''')
+                .period(25m)
+                .every(25m)
+        |alert()
+        .info(lambda: "mean" > 40)
+        .warn(lambda: "mean" > 70)
+        .crit(lambda: "mean" > 90)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Influxdb </h2>
+
+ <p>Alerte pour l'utilisation CPU : Valeur moyenne de l'utilisation systeme est<b> {{ index .Fields "mean"}}</b> pendant les 5 dernieres minutes. </p>
+        ''')
+        .email()
+var cpuuser = batch
+ |query(''' SELECT mean(usage_user) FROM "telegraf"."twenty_days"."cpu" where host='influxserver' and cpu='cpu-total' ''')
+                .period(25m)
+                .every(25m)
+        |alert()
+        .info(lambda: "mean" > 40)
+        .warn(lambda: "mean" > 70)
+        .crit(lambda: "mean" > 90)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Influxdb </h2>
+        <p>Alerte pour l'utilisation CPU : Valeur moyenne du user usage est <b> {{ index .Fields "mean"}}</b> pendant les 5 dernieres minutes. </p>
+        ''')
+        .email()
+
+var cpusteal = batch
+ |query(''' SELECT mean(usage_steal) FROM "telegraf"."twenty_days"."cpu" where host='influxserver' and cpu='cpu-total' ''')
+                .period(20m)
+                .every(20m)
+        |alert()
+        .warn(lambda: "mean" > 20)
+        .crit(lambda: "mean" > 30)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Influxdb </h2>
+        <p>Alerte pour l'utilisation CPU : probleme de host virtuel : Valeur moyenne du steal usage est <b> {{ index .Fields "mean"}}</b> pendant 20 minutes. </p>
+ ''')
+        .email()
+
+
+var ramusedpercent = batch
+ |query(''' SELECT mean(used_percent) FROM "telegraf"."twenty_days"."mem" where host='influxserver' ''')
+                .period(5m)
+                .every(5m)
+        |alert()
+        .info(lambda: "mean" > 60)
+        .warn(lambda: "mean" > 80)
+        .crit(lambda: "mean" > 90)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Influxdb </h2>
+        <p>Alerte pour l'utilisation RAM : Le pourcentage de memoire utilise est de <b> {{ index .Fields "mean"}}</b> . <p>
+        ''')
+        .email()
+
+
+var sysload = batch
+ |query(''' SELECT mean(load15) FROM "telegraf"."twenty_days"."system" where host='influxserver' ''')
+                .period(5m)
+                .every(5m)
+        |alert()
+        .info(lambda: "mean"  > 0.7)
+        .warn(lambda: "mean" > 1.0)
+        .crit(lambda: "mean" > 4.9)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Influxdb </h2>
+        <p>Alerte pour charge systeme : Valeur moyenne du load15 est <b>{{ index .Fields "mean"}}</b>. </p>
+        ''')
+        .email()
+
+
+var diskusedpercent = batch
+ |query(''' SELECT mean(used_percent) FROM "telegraf"."twenty_days"."disk" where host='influxserver' and path='/' ''')
+                .period(5m)
+                .every(5m)
+        |alert()
+        .info(lambda: "mean" > 60)
+        .warn(lambda: "mean" > 80)
+        .crit(lambda: "mean" > 90)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Influxdb </h2>
+        <p>Alerte pour l'utilisation Memoire : Pourcentage du disk utilise est <b>{{ index .Fields "mean"}}</b> . <p>
+        ''')
+        .email()
+
+
+var cpuwait = batch
+        |query(''' SELECT mean(usage_iowait) FROM "telegraf"."twenty_days"."cpu" where host='influxserver' and cpu='cpu-total' ''')
+                .period(25m)
+                .every(25m)
+        |alert()
+        .warn(lambda: "mean" > 0.20)
+        .crit(lambda: "mean" > 0.25)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Influxdb </h2>
+        <p>Alerte pour l'utilisation CPU :usage io wait est <b>{{ index .Fields "mean"}}</b> . </p>
+        ''')
+        .email()
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Alerte pour Serveur Gitlab
+var cpuidle = batch
+    |query(''' SELECT mean(usage_idle) FROM "telegraf"."twenty_days"."cpu" where host='gitlabserver' and cpu='cpu-total' ''')
+        .period(20m)
+        .every(20m)
+    |alert()
+    .info(lambda: "mean" < 70)
+    .warn(lambda: "mean" < 50)
+    .crit(lambda: "mean" < 30)
+    // generer identifiant pour cette alerte
+    .id('{{ .Name }}')
+    // Email subject
+    .message('Alerte {{ .ID }}:{{ .Level }}')
+    // Email body as HTML
+    .details('''
+        <h2> Serveur Gitlab </h2>
+    <p>Alerte pour l'utilisation CPU du serveur Gitlab: Valeur moyenne du usage_idle est <b>{{ index .Fields "mean"}}</b> pour les 25 dernieres minutes. </p>
+    ''')
+    .email()
+
+var cpusystem = batch
+    |query(''' SELECT mean(usage_system) FROM "telegraf"."twenty_days"."cpu" where host='gitlabserver' and cpu='cpu-total' ''')
+                .period(25m)
+                .every(25m)
+        |alert()
+        .info(lambda: "mean" > 50)
+        .warn(lambda: "mean" > 70)
+        .crit(lambda: "mean" > 90)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Gitlab </h2>
+        <p>Alerte pour l'utilisation CPU : Valeur moyenne de l'utilisation systeme est<b> {{ index .Fields "mean"}}</b> pendant les 25 deineres minutes. </p>
+        ''')
+        .email()
+
+
+var cpuuser = batch
+ |query(''' SELECT mean(usage_user) FROM "telegraf"."twenty_days"."cpu" where host='gitlabserver' and cpu='cpu-total' ''')
+                .period(25m)
+                .every(25m)
+        |alert()
+        .info(lambda: "mean" > 40)
+        .warn(lambda: "mean" > 70)
+        .crit(lambda: "mean" > 90)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Gitlab </h2>
+        <p>Alerte pour l'utilisation CPU : Valeur moyenne du user usage est <b> {{ index .Fields "mean"}}</b> pendant les 25 dernieres minutes. </p>
+        ''')
+        .email()
+
+
+
+
+var cpusteal = batch
+ |query(''' SELECT mean(usage_steal) FROM "telegraf"."twenty_days"."cpu" where host='gitlabserver' and cpu='cpu-total' ''')
+                .period(20m)
+                .every(20m)
+        |alert()
+        .warn(lambda: "mean" > 20)
+        .crit(lambda: "mean" > 30)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Gitlab </h2>
+        <p>Alerte pour l'utilisation CPU : probleme de host virtuel : Valeur moyenne du steal usage est <b> {{ index .Fields "mean"}}</b> pendant 20 minutes. </p>
+        ''')
+        .email()
+
+
+
+var cpuirq = batch
+ |query(''' SELECT mean(usage_irq) FROM "telegraf"."twenty_days"."cpu" where host='gitlabserver' and cpu='cpu-total' ''')
+                .period(5m)
+                .every(5m)
+        |alert()
+        .warn(lambda: "mean" > 0)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Gitlab </h2>
+        <p>Alerte pour l'utilisation CPU : Interruption du systeme : Valeur moyenne du usage_irq est <b>{{ index .Fields "mean"}}</b> </p>
+        ''')
+        .email()
+
+
+
+var ramusedpercent = batch
+ |query(''' SELECT mean(used_percent) FROM "telegraf"."twenty_days"."mem" where host='gitlabserver' ''')
+                .period(5m)
+                .every(5m)
+        |alert()
+        .info(lambda: "mean" > 60)
+        .warn(lambda: "mean" > 80)
+        .crit(lambda: "mean" > 90)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Gitlab </h2>
+        <p>Alerte pour l'utilisation RAM : Le pourcentage de memoire utilise est de <b> {{ index .Fields "mean"}}</b> . <p>
+        ''')
+        .email()
+
+
+var sysload = batch
+ |query(''' SELECT mean(load15) FROM "telegraf"."twenty_days"."system" where host='gitlabserver' ''')
+                .period(15m)
+                .every(15m)
+        |alert()
+        .info(lambda: "mean"  > 0.7)
+        .warn(lambda: "mean" > 1.0)
+        .crit(lambda: "mean" > 4.9)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Gitlab </h2>
+        <p>Alerte pour charge systeme : Valeur moyenne du load15 est <b>{{ index .Fields "mean"}}</b>. </p>
+        ''')
+        .email()
+
+
+
+
+var diskusedpercent = batch
+ |query(''' SELECT mean(used_percent) FROM "telegraf"."twenty_days"."disk" where host='gitlabserver' and path='/' ''')
+                .period(5m)
+                .every(5m)
+        |alert()
+        .info(lambda: "mean" > 60)
+        .warn(lambda: "mean" > 80)
+        .crit(lambda: "mean" > 90)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Gitlab </h2>
+        <p>Alerte pour l'utilisation Memoire : Pourcentage du disk utilise est <b>{{ index .Fields "mean"}}</b> . <p>
+        ''')
+        .email()
+
+var cpuwait = batch
+    |query(''' SELECT mean(usage_iowait) FROM "telegraf"."twenty_days"."cpu" where host='gitlabserver' and cpu='cpu-total' ''')
+                .period(15m)
+                .every(15m)
+        |alert()
+        .warn(lambda: "mean" > 0.20)
+        .crit(lambda: "mean" > 0.25)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Gitlab </h2>
+        <p>Alerte pour l'utilisation CPU :usage io wait est <b>{{ index .Fields "mean"}}</b> . </p>
+        ''')
+        .email()
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    //Metrics for Splunkserver
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+//Alerte pour Serveur Splunk
+var cpuidle = batch
+    |query(''' SELECT mean(usage_idle) FROM "telegraf"."twenty_days"."cpu" where host='Splunkserver' and cpu='cpu-total' ''')
+        .period(25m)
+        .every(25m)
+    |alert()
+    .info(lambda: "mean" < 70)
+    .warn(lambda: "mean" < 50)
+    .crit(lambda: "mean" < 30)
+    // generer identifiant pour cette alerte
+    .id('{{ .Name }}')
+    // Email subject
+    .message('Alerte {{ .ID }}:{{ .Level }}')
+    // Email body as HTML
+    .details('''
+        <h2> Serveur Splunk </h2>
+    <p>Alerte pour l'utilisation CPU du serveur Splunk: Valeur moyenne du usage_idle est <b>{{ index .Fields "mean"}}</b> pour les 25 dernieres minutes. </p>
+    ''')
+    .email()
+
+var cpusystem = batch
+    |query(''' SELECT mean(usage_system) FROM "telegraf"."twenty_days"."cpu" where host='Splunkserver' and cpu='cpu-total' ''')
+                .period(25m)
+                .every(25m)
+        |alert()
+        .info(lambda: "mean" > 10)
+        .warn(lambda: "mean" > 30)
+        .crit(lambda: "mean" > 50)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Splunk </h2>
+        <p>Alerte pour l'utilisation CPU : Valeur moyenne de l'utilisation systeme est<b> {{ index .Fields "mean"}}</b> pendant les 25 dernieres minutes. </p>
+        ''')
+        .email()
+
+
+var cpuuser = batch
+ |query(''' SELECT mean(usage_user) FROM "telegraf"."twenty_days"."cpu" where host='Splunkserver' and cpu='cpu-total' ''')
+                .period(25m)
+                .every(25m)
+        |alert()
+        .info(lambda: "mean" > 50)
+        .warn(lambda: "mean" > 70)
+        .crit(lambda: "mean" > 80)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Splunk </h2>
+        <p>Alerte pour l'utilisation CPU : Valeur moyenne du user usage est <b> {{ index .Fields "mean"}}</b> pendant les 25 dernieres minutes. </p>
+        ''')
+        .email()
+
+
+
+
+var cpusteal = batch
+ |query(''' SELECT mean(usage_steal) FROM "telegraf"."twenty_days"."cpu" where host='Splunkserver' and cpu='cpu-total' ''')
+                .period(20m)
+                .every(20m)
+        |alert()
+        .warn(lambda: "mean" > 20)
+        .crit(lambda: "mean" > 30)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Splunk </h2>
+        <p>Alerte pour l'utilisation CPU : probleme de host virtuel : Valeur moyenne du steal usage est <b> {{ index .Fields "mean"}}</b> pendant 20 minutes. </p>
+        ''')
+        .email()
+
+
+
+var cpuirq = batch
+ |query(''' SELECT mean(usage_irq) FROM "telegraf"."twenty_days"."cpu" where host='Splunkserver' and cpu='cpu-total' ''')
+                .period(5m)
+                .every(5m)
+        |alert()
+        .warn(lambda: "mean" > 0)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Splunk </h2>
+        <p>Alerte pour l'utilisation CPU : Interruption du systeme : Valeur moyenne du usage_irq est <b>{{ index .Fields "mean"}}</b> </p>
+        ''')
+        .email()
+
+
+
+var ramusedpercent = batch
+ |query(''' SELECT mean(used_percent) FROM "telegraf"."twenty_days"."mem" where host='Splunkserver' ''')
+                .period(5m)
+                .every(5m)
+        |alert()
+        .info(lambda: "mean" > 50)
+        .warn(lambda: "mean" > 80)
+        .crit(lambda: "mean" > 90)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Splunk </h2>
+        <p>Alerte pour l'utilisation RAM : Le pourcentage de memoire utilise est de <b> {{ index .Fields "mean"}}</b> . <p>
+        ''')
+        .email()
+
+
+var sysload = batch
+ |query(''' SELECT mean(load15) FROM "telegraf"."twenty_days"."system" where host='Splunkserver' ''')
+                .period(15m)
+                .every(15m)
+        |alert()
+        .info(lambda: "mean"  > 0.7)
+        .warn(lambda: "mean" > 1.0)
+        .crit(lambda: "mean" > 4.9)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Splunk </h2>
+        <p>Alerte pour charge systeme : Valeur moyenne du load15 est <b>{{ index .Fields "mean"}}</b>. </p>
+        ''')
+        .email()
+
+
+
+
+var diskusedpercent = batch
+ |query(''' SELECT mean(used_percent) FROM "telegraf"."twenty_days"."disk" where host='Splunkserver' and path='/' ''')
+                .period(5m)
+                .every(5m)
+        |alert()
+        .info(lambda: "mean" > 50)
+        .warn(lambda: "mean" > 80)
+        .crit(lambda: "mean" > 90)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Splunk </h2>
+        <p>Alerte pour l'utilisation Memoire : Pourcentage du disk utilise est <b>{{ index .Fields "mean"}}</b> . <p>
+        ''')
+        .email()
+
+var cpuwait = batch
+    |query(''' SELECT mean(usage_iowait) FROM "telegraf"."twenty_days"."cpu" where host='Splunkserver' and cpu='cpu-total' ''')
+                .period(15m)
+                .every(15m)
+        |alert()
+        .warn(lambda: "mean" > 0.20)
+        .crit(lambda: "mean" > 0.25)
+        // generer identifiant pour cette alerte
+        .id('{{ .Name }}')
+        // Email subject
+        .message('Alerte {{ .ID }}:{{ .Level }}')
+        // Email body as HTML
+        .details('''
+        <h2> Serveur Splunk </h2>
+        <p>Alerte pour l'utilisation CPU :usage io wait est <b>{{ index .Fields "mean"}}</b> . </p>
+        ''')
+        .email()
+
